@@ -35,9 +35,15 @@ class Main extends React.Component {
             <main>
                 <div className="container">
                     <div className="row mt-5">
-                        <div className="container d-flex justify-content-between">
-                            <h1 className="display-4 text-white">Todolist</h1>
-                            <p className="text-white">Built with Ruby on Rails, React and Bootstrap</p>
+                        <div className="container">
+                            <div className="row">
+                                <div className="col-lg">
+                                    <h1 className="display-4 text-white">Todolist</h1>
+                                </div>  
+                                <div className="col-lg">
+                                    <p className="text-light text-lg-right">Built with Ruby on Rails, React and Bootstrap</p>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div className="row mb-5">
@@ -146,8 +152,8 @@ class Main extends React.Component {
         this.setState({ filter: filter }); 
     }
 
-    handleSearch(e) {
-        this.setState({ search: e.target.value });
+    handleSearch(term) {
+        this.setState({ search: term });
     }
 
     updateToLatestState() {
@@ -190,12 +196,17 @@ class SearchFilter extends React.Component {
         return (
             <div className="shadow-sm list-group">
                 <li className="list-group-item p-2">
-                    <input
-                        className="form-control"
-                        onChange={this.props.setSearch}
-                        value={this.props.search}
-                        placeholder="Search"
-                    />
+                    <div className="input-group">
+                        <input
+                            className="form-control"
+                            onChange={(e) => this.props.setSearch(e.target.value)}
+                            value={this.props.search}
+                            placeholder="Search"
+                        />
+                        <div className="input-group-append">
+                            <button className="btn btn-outline-info" onClick={() => this.props.setSearch('')}>X</button>
+                        </div>
+                    </div>
                 </li>
                 <button key="all" className={this.props.filter ? "list-group-item list-group-item-action py-2" : "list-group-item list-group-item-info list-group-item-action py-2"} onClick={(e) => this.props.setFilter('')}>All todos</button>
                 {this.props.tags.map(tag => 
@@ -234,7 +245,7 @@ class Todo extends React.Component {
 
     constructor(props) {
         super(props);
-        this.state = { editing: false, text: this.props.text, tagList: this.props.tagList };
+        this.state = { editing: false, text: this.props.text, tags: this.props.tagList.toString() };
         this.handleChange = this.handleChange.bind(this);
         this.handleTagsChange = this.handleTagsChange.bind(this);
         this.handleEditing = this.handleEditing.bind(this);
@@ -245,7 +256,7 @@ class Todo extends React.Component {
     }
 
     handleTagsChange(e) {
-        this.setState({ tagList: e.target.value.split(",").map(item => item.trim()) });
+        this.setState({ tags: e.target.value });
     }
 
     handleEditing(e) {
@@ -259,12 +270,12 @@ class Todo extends React.Component {
                 <li className="list-group-item" key={this.props.id} >
                     <div className="input-group">
                         <input className="form-control form-control-sm" onChange={this.handleChange} value={this.state.text} placeholder="Description" required/>
-                        <input className="form-control form-control-sm" onChange={this.handleTagsChange} value={this.state.tagList.toString()} placeholder="Comma-separated tags" />
+                        <input className="form-control form-control-sm" onChange={this.handleTagsChange} value={this.state.tags} placeholder="Comma-separated tags" />
                         <div className="input-group-append">
                         <button
                             className="btn btn-info btn-sm"
                             onClick={(e) => {
-                                let editedTodo = {id: this.props.id, description: this.state.text, tag_list: this.state.tagList };
+                                let editedTodo = {id: this.props.id, description: this.state.text, tag_list: this.state.tags.split(",").map(item => item.trim()) };
                                 this.props.editHandler(editedTodo);
                                 this.handleEditing(e);
                             }}
@@ -294,7 +305,7 @@ class Todo extends React.Component {
                                     {this.props.completed ? <del>{this.state.text}</del> : <span>{this.state.text}</span>}
                                 </label>
                                 <div>
-                                    {this.state.tagList.map((tag, index) => <button key={index} onClick={() => this.props.setFilter(tag)} className="badge badge-info mr-1">{tag}</button>)}
+                                    {this.props.tagList.map((tag, index) => <button key={index} onClick={() => this.props.setFilter(tag)} className="badge badge-info mr-1">{tag}</button>)}
                                 </div>
                             </div>
                             
