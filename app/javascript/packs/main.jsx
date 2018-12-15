@@ -13,12 +13,14 @@ class Main extends React.Component {
     
     constructor(props) {
         super(props);
-        this.state = { items: [], text: '' };
+        this.state = { items: [], tags: [], text: '', filter: '', search: '' };
         this.handleChange = this.handleChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
         this.handleDelete = this.handleDelete.bind(this);
         this.handleEdit = this.handleEdit.bind(this);
         this.handleComplete = this.handleComplete.bind(this);
+        this.handleFilter = this.handleFilter.bind(this);
+        this.handleSearch = this.handleSearch.bind(this);
         this.updateToLatestState = this.updateToLatestState.bind(this);
     }
 
@@ -27,15 +29,24 @@ class Main extends React.Component {
     }
 
     render() {
+        let filteredItems = this.state.filter ? this.state.items.filter(item => item.tag_list.includes(this.state.filter)) : this.state.items;
+        filteredItems = this.state.search ? filteredItems.filter(item => item.description.includes(this.state.search) || item.tag_list.includes(this.state.search)) : filteredItems;
         return (
             <main>
                 <div className="container">
-                    <div className="row mt-5 d-flex justify-content-between">
-                        <h1 className="display-4 text-white">Todolist</h1>
-                        <span className="text-white">Built with Ruby on Rails, React and Bootstrap</span>
+                    <div className="row mt-5">
+                        <div className="container d-flex justify-content-between">
+                            <h1 className="display-4 text-white">Todolist</h1>
+                            <p className="text-white">Built with Ruby on Rails, React and Bootstrap</p>
+                        </div>
                     </div>
                     <div className="row mb-5">
-                        <div className="col-2">
+                        <div className="col-lg-3">
+                            <div className="row mt-3">
+                                <div className="container">
+                                    <SearchFilter tags={this.state.tags} filter={this.state.filter} setFilter={this.handleFilter} search={this.state.search} setSearch={this.handleSearch} />
+                                </div>
+                            </div>
                         </div>
                         <div className="col">
                             <div className="row mt-3">
@@ -48,11 +59,10 @@ class Main extends React.Component {
                                         autoFocus
                                     />
                                 </form>
-                                
                             </div>
                             <div className="row mt-3">
                                 <div className="container">
-                                    <TodoList items={this.state.items} deleteHandler={this.handleDelete} completeHandler={this.handleComplete} editHandler={this.handleEdit} />
+                                    <TodoList items={filteredItems} deleteHandler={this.handleDelete} completeHandler={this.handleComplete} editHandler={this.handleEdit} setFilter={this.handleFilter} />
                                 </div>
                             </div>
                         </div>
@@ -69,7 +79,7 @@ class Main extends React.Component {
     handleSubmit(e) {
         
         e.preventDefault();
-        if (!this.state.text.length) { return;}
+        if (!this.state.text.length) { return; }
         
         let body = JSON.stringify({todo: {completed: false, description: this.state.text} });
         fetch(`api/todos`, {
@@ -155,11 +165,33 @@ class Main extends React.Component {
 
     }
 
+    handleFilter(filter) {
+        this.setState({ filter: filter }); 
+    }
+
+    handleSearch(e) {
+        this.setState({ search: e.target.value });
+    }
+
     updateToLatestState() {
+        function flatten(arr) {
+            return arr.reduce(function (flat, toFlatten) {
+                return flat.concat(Array.isArray(toFlatten) ? flatten(toFlatten) : toFlatten);
+            }, []);
+        }
         try {
             fetch(`/api/todos`)
-            .then((response) => { return response.json(); })
-            .then((data) => { this.setState({ items: data }); });
+            .then((response) => { 
+                const json = response.json();
+                console.log(json);
+                return json; 
+            })
+            .then((data) => { 
+                const allTags = flatten(data.map(item => item.tag_list));
+                const allTagsSet = Array.from(new Set(allTags))
+                this.setState({ items: data, tags: allTagsSet }); 
+                console.log(this.state);
+            });
         } catch (err) {
             console.log('fetch failed', err);
         }
@@ -167,13 +199,48 @@ class Main extends React.Component {
 
 }
 
-class TodoList extends React.Component {
+class SearchFilter extends React.Component {
     render() {
         return (
-            <ul className="shadow list-group">
-                {this.props.items.map(item => <Todo key={item.id} id={item.id} text={item.description} completed={item.completed} deleteHandler={this.props.deleteHandler} completeHandler={this.props.completeHandler} editHandler={this.props.editHandler} />)}
-            </ul>       
+            <div className="shadow-sm list-group">
+                <li className="list-group-item p-2">
+                    <input
+                        className="form-control"
+                        onChange={this.props.setSearch}
+                        value={this.props.search}
+                        placeholder="Search"
+                    />
+                </li>
+                <button key="all" className={this.props.filter ? "list-group-item list-group-item-action py-2" : "list-group-item list-group-item-info list-group-item-action py-2"} onClick={(e) => this.props.setFilter('')}>All todos</button>
+                {this.props.tags.map(tag => 
+                    <button 
+                        key={tag} 
+                        className={this.props.filter == tag ? "list-group-item list-group-item-info list-group-item-action py-2" : "list-group-item list-group-item-action py-2"}
+                        onClick={() => this.props.setFilter(tag)}
+                    >
+                        {tag}
+                    </button>
+                )}
+            </div>
         );
+    }
+}
+
+class TodoList extends React.Component {
+    render() {
+        if (this.props.items.length) {
+            return (
+                <ul className="shadow list-group">
+                    {this.props.items.map(item => <Todo key={item.id} id={item.id} text={item.description} completed={item.completed} tagList={item.tag_list} deleteHandler={this.props.deleteHandler} completeHandler={this.props.completeHandler} editHandler={this.props.editHandler} setFilter={this.props.setFilter}/>)}
+                </ul>       
+            );
+        } else {
+            return (
+                <div className="alert alert-warning shadow" role="alert">
+                    No todos. Try adding a new todo or changing the search term and filter.
+                </div>
+            );
+        }
     }
 }
 
@@ -181,13 +248,18 @@ class Todo extends React.Component {
 
     constructor(props) {
         super(props);
-        this.state = { editing: false, text: this.props.text };
+        this.state = { editing: false, text: this.props.text, tagList: this.props.tagList };
         this.handleChange = this.handleChange.bind(this);
+        this.handleTagsChange = this.handleTagsChange.bind(this);
         this.handleEditing = this.handleEditing.bind(this);
     }
 
     handleChange(e) {
         this.setState({ text: e.target.value });
+    }
+
+    handleTagsChange(e) {
+        this.setState({ tagList: e.target.value.split(",").map(item => item.trim()) });
     }
 
     handleEditing(e) {
@@ -199,13 +271,14 @@ class Todo extends React.Component {
         if (this.state.editing) {
             return (
                 <li className="list-group-item" key={this.props.id} >
-                    <div class="input-group">
-                        <input className="form-control form-control-sm" onChange={this.handleChange} value={this.state.text} />
-                        <div class="input-group-append">
+                    <div className="input-group">
+                        <input className="form-control form-control-sm" onChange={this.handleChange} value={this.state.text} placeholder="Description" required/>
+                        <input className="form-control form-control-sm" onChange={this.handleTagsChange} value={this.state.tagList.toString()} placeholder="Comma-separated tags" />
+                        <div className="input-group-append">
                         <button
-                            className="btn btn-primary btn-sm"
+                            className="btn btn-info btn-sm"
                             onClick={(e) => {
-                                let editedTodo = {id: this.props.id, description: this.state.text};
+                                let editedTodo = {id: this.props.id, description: this.state.text, tag_list: this.state.tagList };
                                 this.props.editHandler(editedTodo);
                                 this.handleEditing(e);
                             }}
@@ -220,7 +293,7 @@ class Todo extends React.Component {
             return (
                 <li className={this.props.completed ? "list-group-item disabled d-flex justify-content-between align-items-center" : "list-group-item d-flex justify-content-between align-items-center"} key={this.props.id}>
                     <div className="flex-grow-1">
-                        <div class="form-check">
+                        <div className="form-check">
                             <input
                                 className="form-check-input"
                                 type="checkbox"
@@ -230,12 +303,18 @@ class Todo extends React.Component {
                                     this.props.completeHandler(editedTodo);
                                 }}
                             />
-                            <label class="form-check-label">
-                                {this.props.completed ? <del>{this.state.text}</del> : <span>{this.state.text}</span>}
-                            </label>
+                            <div className="d-flex justify-content-between">
+                                <label className="form-check-label">
+                                    {this.props.completed ? <del>{this.state.text}</del> : <span>{this.state.text}</span>}
+                                </label>
+                                <div>
+                                    {this.state.tagList.map((tag, index) => <button key={index} onClick={() => this.props.setFilter(tag)} className="badge badge-info mr-1">{tag}</button>)}
+                                </div>
+                            </div>
+                            
                         </div>
                     </div>
-                    <div className="btn-group btn-group-sm" role="group">
+                    <div className="btn-group btn-group-sm ml-1" role="group">
                         <button className="btn btn-light" onClick={this.handleEditing}>Edit</button>
                         <button className="btn btn-light" onClick={() => this.props.deleteHandler(this.props.id)}>Delete</button>
                     </div>
