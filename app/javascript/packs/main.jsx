@@ -18,10 +18,10 @@ class Main extends React.Component {
         this.handleSubmit = this.handleSubmit.bind(this);
         this.handleDelete = this.handleDelete.bind(this);
         this.handleEdit = this.handleEdit.bind(this);
-        this.handleComplete = this.handleComplete.bind(this);
         this.handleFilter = this.handleFilter.bind(this);
         this.handleSearch = this.handleSearch.bind(this);
         this.updateToLatestState = this.updateToLatestState.bind(this);
+        this.updateTagList = this.updateTagList.bind(this);
     }
 
     componentDidMount() {
@@ -62,7 +62,7 @@ class Main extends React.Component {
                             </div>
                             <div className="row mt-3">
                                 <div className="container">
-                                    <TodoList items={filteredItems} deleteHandler={this.handleDelete} completeHandler={this.handleComplete} editHandler={this.handleEdit} setFilter={this.handleFilter} />
+                                    <TodoList items={filteredItems} deleteHandler={this.handleDelete} editHandler={this.handleEdit} setFilter={this.handleFilter} />
                                 </div>
                             </div>
                         </div>
@@ -91,14 +91,14 @@ class Main extends React.Component {
         })
         .then((response) => { return response.json(); })
         .then((todo)=>{
+            /*
             this.updateToLatestState();
             this.setState({text: ''});
-            /*
+            */
             this.setState(state => ({
                 items: state.items.concat(todo),
                 text: ''
-            }));
-            */
+            }), () => this.updateTagList());
         });
 
     }
@@ -112,8 +112,8 @@ class Main extends React.Component {
             },
         })
         .then((response) => { 
-            this.updateToLatestState();
-            // this.setState({ items: this.state.items.filter(item => item.id != key) }) 
+            // this.updateToLatestState();
+            this.setState({ items: this.state.items.filter(item => item.id != key) }, () => this.updateTagList()) ;
         });
         
     }
@@ -128,41 +128,18 @@ class Main extends React.Component {
             }
         }).then((response) => { return response.json(); })
         .then((data) => { 
-            this.updateToLatestState();
-            /*
-            let items = [...this.state.items];
-            const index = items.findIndex(item => item.id == data.id);
-            let item = { ...items[index] };
-            item.description = data.description;
-            items[index] = item;
-            this.setState({ items });
-            */
-        });
-        
-    }
-
-    handleComplete(todo) {
-
-        fetch(`api/todos/${todo.id}`, {
-            method: 'PUT',
-            body: JSON.stringify({todo: todo}),
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        }).then((response) => { return response.json(); })
-        .then((data) => { 
-            this.updateToLatestState();
-            /*
+            // this.updateToLatestState();
+            console.log(data);
             let items = [...this.state.items];
             const index = items.findIndex(item => item.id == data.id);
             let item = { ...items[index] };
             item.completed = data.completed;
+            item.description = data.description;
+            item.tag_list = data.tag_list;
             items[index] = item;
-            this.setState({ items });
-            */
+            this.setState({ items }, () => this.updateTagList());
         });
         
-
     }
 
     handleFilter(filter) {
@@ -195,6 +172,15 @@ class Main extends React.Component {
         } catch (err) {
             console.log('fetch failed', err);
         }
+    }
+
+    updateTagList() {
+        function flatten(arr) {
+            return arr.reduce((flat, toFlatten) => flat.concat(Array.isArray(toFlatten) ? flatten(toFlatten) : toFlatten), []);
+        }
+        const allTags = flatten(this.state.items.map(item => item.tag_list));
+        const allTagsSet = new Set(allTags);
+        this.setState({ tags: Array.from(allTagsSet) }); 
     }
 
 }
@@ -231,7 +217,7 @@ class TodoList extends React.Component {
         if (this.props.items.length) {
             return (
                 <ul className="shadow list-group">
-                    {this.props.items.map(item => <Todo key={item.id} id={item.id} text={item.description} completed={item.completed} tagList={item.tag_list} deleteHandler={this.props.deleteHandler} completeHandler={this.props.completeHandler} editHandler={this.props.editHandler} setFilter={this.props.setFilter}/>)}
+                    {this.props.items.map(item => <Todo key={item.id} id={item.id} text={item.description} completed={item.completed} tagList={item.tag_list} deleteHandler={this.props.deleteHandler} editHandler={this.props.editHandler} setFilter={this.props.setFilter}/>)}
                 </ul>       
             );
         } else {
@@ -300,7 +286,7 @@ class Todo extends React.Component {
                                 checked={this.props.completed}
                                 onChange={() => {
                                     let editedTodo = {id: this.props.id, completed: !this.props.completed};
-                                    this.props.completeHandler(editedTodo);
+                                    this.props.editHandler(editedTodo);
                                 }}
                             />
                             <div className="d-flex justify-content-between">
