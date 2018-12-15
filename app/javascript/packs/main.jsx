@@ -30,7 +30,7 @@ class Main extends React.Component {
 
     render() {
         let filteredItems = this.state.filter ? this.state.items.filter(item => item.tag_list.includes(this.state.filter)) : this.state.items;
-        filteredItems = this.state.search ? filteredItems.filter(item => item.description.includes(this.state.search) || item.tag_list.includes(this.state.search)) : filteredItems;
+        filteredItems = this.state.search ? filteredItems.filter(item => item.description.toLowerCase().includes(this.state.search.toLowerCase()) || item.tag_list.some(tag => tag.toLowerCase() == this.state.search.toLowerCase())) : filteredItems;
         return (
             <main>
                 <div className="container">
