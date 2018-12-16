@@ -47,7 +47,8 @@ export default class Main extends React.Component {
                                     <h1 className="display-4 text-white">Todolist</h1>
                                 </div>  
                                 <div className="col-lg">
-                                    <p className="text-light text-lg-right">Built with Ruby on Rails, React and Bootstrap</p>
+                                    <p className="text-light text-lg-right mt-2 mb-0 p-0">Built with <i className="far fa-gem"></i> Ruby on Rails, <i className="fab fa-react"></i> React and Bootstrap.</p>
+                                    <p className="text-lg-right mt-0 mb-2 p-0"><a className="text-light" href="https://github.com/rlrh1996/rails-react-todolist">View it on <i className="fab fa-github"></i> Github.</a></p>
                                 </div>
                             </div>
                         </div>

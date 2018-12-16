@@ -44,6 +44,8 @@ export default class TodoItem extends React.Component {
                                 handleAddition={this.handleAddition} 
                                 allowNew={true}
                                 autofocus={false}
+                                addOnBlur={true}
+                                delimiters={[13,9,188]}
                                 classNames={
                                     {
                                         root: '',
