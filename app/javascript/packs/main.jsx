@@ -50,13 +50,18 @@ export default class Main extends React.Component {
                         <div className="col">
                             <div className="row mt-3">
                                 <form className="container" onSubmit={this.handleSubmit}>
-                                    <input
-                                        className="shadow form-control form-control-lg"
-                                        onChange={this.handleChange}
-                                        value={this.state.text}
-                                        placeholder="What do you need to do?"
-                                        autoFocus
-                                    />
+                                    <div className="shadow input-group">
+                                        <input
+                                            className="form-control form-control-lg"
+                                            onChange={this.handleChange}
+                                            value={this.state.text}
+                                            placeholder="What do you need to do?"
+                                            autoFocus
+                                        />
+                                        <div className="input-group-append">
+                                            <button className="btn btn-lg btn-info" type="submit">+</button>
+                                        </div>
+                                    </div>
                                 </form>
                             </div>
                             <div className="row mt-3">
