@@ -12,8 +12,69 @@
  *
  */
 
- $fa-font-path: '~@fortawesome/fontawesome-free/webfonts';
+$fa-font-path: '~@fortawesome/fontawesome-free/webfonts';
 @import '~bootstrap/scss/bootstrap';
 @import '~@fortawesome/fontawesome-free/scss/fontawesome';
 @import '~@fortawesome/fontawesome-free/scss/regular';
 @import '~@fortawesome/fontawesome-free/scss/solid';
+
+.react-tags {
+    position: relative;
+    padding: 6px 0 0 6px;
+    border: 1px solid #D1D1D1;
+    border-radius: 1px;
+  
+    /* shared font styles */
+    font-size: 1em;
+    line-height: 1.2;
+  
+    /* clicking anywhere will focus the input */
+    cursor: text;
+}
+  
+.react-tags.is-focused {
+    border-color: #B1B1B1;
+}
+  
+.react-tags__selected {
+    display: inline;
+}
+  
+.react-tags__selected-tag:after {
+    content: '\2715';
+    margin-left: 8px;
+}
+  
+.react-tags__search {
+    display: inline-block;
+    /* prevent autoresize overflowing the container */
+    max-width: 100%;
+}
+  
+@media screen and (min-width: 30em) {
+  
+    .react-tags__search {
+        /* this will become the offsetParent for suggestions */
+        position: relative;
+    }
+  
+}
+  
+.react-tags__search input {
+    /* prevent autoresize overflowing the container */
+    max-width: 100%;
+  
+    /* remove styles and layout from this element */
+    margin: 0;
+    padding: 0;
+    border: 0;
+    outline: none;
+  
+    /* match the font styles */
+    font-size: inherit;
+    line-height: inherit;
+}
+  
+.react-tags__search input::-ms-clear {
+    display: none;
+}

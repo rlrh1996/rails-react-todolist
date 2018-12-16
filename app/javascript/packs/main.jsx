@@ -132,8 +132,6 @@ export default class Main extends React.Component {
             }
         }).then((response) => { return response.json(); })
         .then((data) => { 
-            // this.updateToLatestState();
-            console.log(data);
             let items = [...this.state.items];
             const index = items.findIndex(item => item.id == data.id);
             let item = { ...items[index] };
@@ -156,9 +154,7 @@ export default class Main extends React.Component {
 
     updateToLatestState() {
         function flatten(arr) {
-            return arr.reduce(function (flat, toFlatten) {
-                return flat.concat(Array.isArray(toFlatten) ? flatten(toFlatten) : toFlatten);
-            }, []);
+            return arr.reduce((flat, toFlatten) => flat.concat(Array.isArray(toFlatten) ? flatten(toFlatten) : toFlatten), []);
         }
         try {
             fetch(`/api/todos`)
@@ -169,9 +165,9 @@ export default class Main extends React.Component {
             })
             .then((data) => { 
                 const allTags = flatten(data.map(item => item.tag_list));
-                const allTagsSet = Array.from(new Set(allTags))
-                this.setState({ items: data, tags: allTagsSet }); 
-                console.log(this.state);
+                const tagsSet = new Set(allTags);
+                const tagsArray = Array.from(tagsSet);
+                this.setState({ items: data, tags: tagsArray }, () => console.log(this.state)); 
             });
         } catch (err) {
             console.log('fetch failed', err);
