@@ -4,7 +4,7 @@ Heroku automatically deploys from here to [https://rails-react-todolist.herokuap
 This README would normally document whatever steps are necessary to get the
 application up and running. But this is not a normal README.
 
-Things you may want to cover (but didn't):
+Things I may want to cover (but don't):
 
 * Ruby version
 
