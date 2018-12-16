@@ -71,8 +71,8 @@ export default class TodoItem extends React.Component {
                         </div>
                     </div>
                     <div className="btn-group btn-group-sm ml-1" role="group">
-                        <button className="btn btn-outline-info" onClick={this.handleEditing}>Edit</button>
-                        <button className="btn btn-outline-info" onClick={() => this.props.deleteHandler(this.props.id)}>Delete</button>
+                        <button className="btn btn-outline-info" onClick={this.handleEditing}><i className="far fa-edit"></i></button>
+                        <button className="btn btn-outline-danger" onClick={() => this.props.deleteHandler(this.props.id)}><i className="far fa-trash-alt"></i></button>
                     </div>
                 </li>
             );

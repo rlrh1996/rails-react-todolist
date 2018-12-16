@@ -59,7 +59,7 @@ export default class Main extends React.Component {
                                             autoFocus
                                         />
                                         <div className="input-group-append">
-                                            <button className="btn btn-lg btn-info" type="submit">+</button>
+                                            <button className="btn btn-lg btn-info" type="submit"><i className="fas fa-plus"></i></button>
                                         </div>
                                     </div>
                                 </form>

@@ -13,7 +13,7 @@ export default class SearchFilter extends React.Component {
                             placeholder="Search"
                         />
                         <div className="input-group-append">
-                            <button className="btn btn-outline-info" onClick={() => this.props.setSearch('')}>X</button>
+                            <button className="btn btn-outline-info" onClick={() => this.props.setSearch('')}><i className="fas fa-times"></i></button>
                         </div>
                     </div>
                 </li>
