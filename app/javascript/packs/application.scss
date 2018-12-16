@@ -19,6 +19,10 @@ $fa-font-path: '~@fortawesome/fontawesome-free/webfonts';
 @import '~@fortawesome/fontawesome-free/scss/solid';
 @import '~@fortawesome/fontawesome-free/scss/brands';
 
+.scrollable {
+    overflow: auto;
+}
+
 .react-tags {
     position: relative;
     padding: 6px 0 0 6px;
