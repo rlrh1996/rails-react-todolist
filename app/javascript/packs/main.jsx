@@ -1,15 +1,8 @@
-import React from 'react'
-import ReactDOM from 'react-dom'
+import React from 'react';
+import SearchFilter from './searchFilter';
+import TodoList from './todoList';
 
-document.addEventListener('DOMContentLoaded', () => {
-    document.body.style = 'background: linear-gradient(90deg, #00C9FF 0%, #92FE9D 100%);';
-    ReactDOM.render(
-        <Main/>,
-        document.body.appendChild(document.createElement('div')),
-    )
-})
-
-class Main extends React.Component {
+export default class Main extends React.Component {
     
     constructor(props) {
         super(props);
@@ -187,138 +180,6 @@ class Main extends React.Component {
         const allTags = flatten(this.state.items.map(item => item.tag_list));
         const allTagsSet = new Set(allTags);
         this.setState({ tags: Array.from(allTagsSet) }); 
-    }
-
-}
-
-class SearchFilter extends React.Component {
-    render() {
-        return (
-            <div className="shadow-sm list-group">
-                <li className="list-group-item p-2">
-                    <div className="input-group">
-                        <input
-                            className="form-control"
-                            onChange={(e) => this.props.setSearch(e.target.value)}
-                            value={this.props.search}
-                            placeholder="Search"
-                        />
-                        <div className="input-group-append">
-                            <button className="btn btn-outline-info" onClick={() => this.props.setSearch('')}>X</button>
-                        </div>
-                    </div>
-                </li>
-                <button key="all" className={this.props.filter ? "list-group-item list-group-item-action py-2" : "list-group-item list-group-item-info list-group-item-action py-2"} onClick={(e) => this.props.setFilter('')}>All todos</button>
-                {this.props.tags.map(tag => 
-                    <button 
-                        key={tag} 
-                        className={this.props.filter == tag ? "list-group-item list-group-item-info list-group-item-action py-2" : "list-group-item list-group-item-action py-2"}
-                        onClick={() => this.props.setFilter(tag)}
-                    >
-                        {tag}
-                    </button>
-                )}
-            </div>
-        );
-    }
-}
-
-class TodoList extends React.Component {
-    render() {
-        if (this.props.items.length) {
-            return (
-                <ul className="shadow list-group">
-                    {this.props.items.map(item => <Todo key={item.id} id={item.id} text={item.description} completed={item.completed} tagList={item.tag_list} deleteHandler={this.props.deleteHandler} editHandler={this.props.editHandler} setFilter={this.props.setFilter}/>)}
-                </ul>       
-            );
-        } else {
-            return (
-                <div className="alert alert-warning shadow" role="alert">
-                    No todos. Try adding a new todo or changing the search term and filter.
-                </div>
-            );
-        }
-    }
-}
-
-class Todo extends React.Component {
-
-    constructor(props) {
-        super(props);
-        this.state = { editing: false, text: this.props.text, tags: this.props.tagList.toString() };
-        this.handleChange = this.handleChange.bind(this);
-        this.handleTagsChange = this.handleTagsChange.bind(this);
-        this.handleEditing = this.handleEditing.bind(this);
-    }
-
-    handleChange(e) {
-        this.setState({ text: e.target.value });
-    }
-
-    handleTagsChange(e) {
-        this.setState({ tags: e.target.value });
-    }
-
-    handleEditing(e) {
-        this.setState({ editing: !this.state.editing });
-    }
-
-    render() {
-
-        if (this.state.editing) {
-            return (
-                <li className="list-group-item" key={this.props.id} >
-                    <div className="input-group">
-                        <input className="form-control form-control-sm" onChange={this.handleChange} value={this.state.text} placeholder="Description" required/>
-                        <input className="form-control form-control-sm" onChange={this.handleTagsChange} value={this.state.tags} placeholder="Comma-separated tags" />
-                        <div className="input-group-append">
-                        <button
-                            className="btn btn-info btn-sm"
-                            onClick={(e) => {
-                                let editedTodo = {id: this.props.id, description: this.state.text, tag_list: this.state.tags.split(",").map(item => item.trim()) };
-                                this.props.editHandler(editedTodo);
-                                this.handleEditing(e);
-                            }}
-                        >
-                            Done
-                        </button>
-                        </div>
-                    </div>
-                </li>
-            );
-        } else {
-            return (
-                <li className={this.props.completed ? "list-group-item disabled d-flex justify-content-between align-items-center" : "list-group-item d-flex justify-content-between align-items-center"} key={this.props.id}>
-                    <div className="flex-grow-1">
-                        <div className="form-check">
-                            <input
-                                className="form-check-input"
-                                type="checkbox"
-                                checked={this.props.completed}
-                                onChange={() => {
-                                    let editedTodo = {id: this.props.id, completed: !this.props.completed};
-                                    this.props.editHandler(editedTodo);
-                                }}
-                            />
-                            <div className="d-flex justify-content-between">
-                                <label className="form-check-label">
-                                    {this.props.completed ? <del>{this.state.text}</del> : <span>{this.state.text}</span>}
-                                </label>
-                                <div>
-                                    {this.props.tagList.map((tag, index) => <button key={index} onClick={() => this.props.setFilter(tag)} className="badge badge-info mr-1">{tag}</button>)}
-                                </div>
-                            </div>
-                            
-                        </div>
-                    </div>
-                    <div className="btn-group btn-group-sm ml-1" role="group">
-                        <button className="btn btn-light" onClick={this.handleEditing}>Edit</button>
-                        <button className="btn btn-light" onClick={() => this.props.deleteHandler(this.props.id)}>Delete</button>
-                    </div>
-                </li>
-            );
-        }
-
     }
 
 }

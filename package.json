@@ -9,7 +9,8 @@
     "popper.js": "^1.14.6",
     "prop-types": "^15.6.2",
     "react": "^16.6.3",
-    "react-dom": "^16.6.3"
+    "react-dom": "^16.6.3",
+    "react-tag-autocomplete": "^5.8.0"
   },
   "devDependencies": {
     "webpack-dev-server": "2.11.2"
