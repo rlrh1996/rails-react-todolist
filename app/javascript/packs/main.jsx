@@ -13,17 +13,30 @@ export default class Main extends React.Component {
         this.handleEdit = this.handleEdit.bind(this);
         this.handleFilter = this.handleFilter.bind(this);
         this.handleSearch = this.handleSearch.bind(this);
-        this.updateToLatestState = this.updateToLatestState.bind(this);
+        this.getFilteredSearchedItems = this.getFilteredSearchedItems.bind(this);
         this.updateTagList = this.updateTagList.bind(this);
     }
 
     componentDidMount() {
-        this.updateToLatestState();
+        try {
+            fetch(`/api/todos`)
+            .then((response) => { 
+                const json = response.json();
+                console.log(json);
+                return json; 
+            })
+            .then((data) => { 
+                const allTags = flatten(data.map(item => item.tag_list));
+                const tagsSet = new Set(allTags);
+                const tagsArray = Array.from(tagsSet);
+                this.setState({ items: data, tags: tagsArray }, () => console.log(this.state)); 
+            });
+        } catch (err) {
+            console.log('fetch failed', err);
+        }
     }
 
     render() {
-        let filteredItems = this.state.filter ? this.state.items.filter(item => item.tag_list.includes(this.state.filter)) : this.state.items;
-        filteredItems = this.state.search ? filteredItems.filter(item => item.description.toLowerCase().includes(this.state.search.toLowerCase()) || item.tag_list.some(tag => tag.toLowerCase() == this.state.search.toLowerCase())) : filteredItems;
         return (
             <main>
                 <div className="container">
@@ -66,7 +79,7 @@ export default class Main extends React.Component {
                             </div>
                             <div className="row mt-3">
                                 <div className="container">
-                                    <TodoList items={filteredItems} deleteHandler={this.handleDelete} editHandler={this.handleEdit} setFilter={this.handleFilter} />
+                                    <TodoList items={this.getFilteredSearchedItems()} deleteHandler={this.handleDelete} editHandler={this.handleEdit} setFilter={this.handleFilter} />
                                 </div>
                             </div>
                         </div>
@@ -133,7 +146,7 @@ export default class Main extends React.Component {
         }).then((response) => { return response.json(); })
         .then((data) => { 
             let items = [...this.state.items];
-            const index = items.findIndex(item => item.id == data.id);
+            const index = items.findIndex(item => item.id === data.id);
             let item = { ...items[index] };
             item.completed = data.completed;
             item.description = data.description;
@@ -152,35 +165,39 @@ export default class Main extends React.Component {
         this.setState({ search: term });
     }
 
-    updateToLatestState() {
-        function flatten(arr) {
-            return arr.reduce((flat, toFlatten) => flat.concat(Array.isArray(toFlatten) ? flatten(toFlatten) : toFlatten), []);
+    getFilteredSearchedItems() {
+        let items = [];
+        switch (this.state.filter) {
+            case '':
+                items = this.state.items;
+                break;
+            case 'active':
+                items = this.state.items.filter(item => !item.completed);
+                break;
+            case 'completed':
+                items = this.state.items.filter(item => item.completed);
+                break;
+            default:
+                items = this.state.items.filter(item => item.tag_list.includes(this.state.filter));
+                break;
         }
-        try {
-            fetch(`/api/todos`)
-            .then((response) => { 
-                const json = response.json();
-                console.log(json);
-                return json; 
-            })
-            .then((data) => { 
-                const allTags = flatten(data.map(item => item.tag_list));
-                const tagsSet = new Set(allTags);
-                const tagsArray = Array.from(tagsSet);
-                this.setState({ items: data, tags: tagsArray }, () => console.log(this.state)); 
-            });
-        } catch (err) {
-            console.log('fetch failed', err);
+        if (this.state.search) {
+            return items.filter(item => 
+                item.description.toLowerCase().includes(this.state.search.toLowerCase()) || 
+                item.tag_list.some(tag => tag.toLowerCase() === this.state.search.toLowerCase())
+            );
         }
+        return items;
     }
 
     updateTagList() {
-        function flatten(arr) {
-            return arr.reduce((flat, toFlatten) => flat.concat(Array.isArray(toFlatten) ? flatten(toFlatten) : toFlatten), []);
-        }
         const allTags = flatten(this.state.items.map(item => item.tag_list));
         const allTagsSet = new Set(allTags);
         this.setState({ tags: Array.from(allTagsSet) }); 
     }
 
+}
+
+function flatten(arr) {
+    return arr.reduce((flat, toFlatten) => flat.concat(Array.isArray(toFlatten) ? flatten(toFlatten) : toFlatten), []);
 }
