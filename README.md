@@ -1,6 +1,6 @@
 # README
 
-A01803040U RAYNER LIM RI HAN
+A0180340U RAYNER LIM RI HAN
 
 Heroku automatically deploys from here to [https://rails-react-todolist.herokuapp.com/](https://rails-react-todolist.herokuapp.com/)
 
