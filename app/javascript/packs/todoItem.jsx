@@ -61,7 +61,7 @@ export default class TodoItem extends React.Component {
                                         searchInput: 'react-tags__search input',
                                     }
                                 }
-                                 />
+                            />
                         </div> 
                     </div>
                     <button
