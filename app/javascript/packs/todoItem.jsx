@@ -35,11 +35,11 @@ export default class TodoItem extends React.Component {
         if (this.state.editing) {
             return (
                 <li className="list-group-item" key={this.props.id} >
-                    <div class="form-group m-0">
+                    <div className="form-group m-0">
                         <label className="col-form-label-sm m-0" for="description">Description</label>
                         <input className="form-control form-control-sm m-0" onChange={this.handleChange} value={this.state.text} placeholder="What do you need to do?" id="description" autoFocus required/>
                     </div>  
-                    <div class="form-group mt-0">  
+                    <div className="form-group mt-0">  
                         <label className="col-form-label-sm m-0" for="tags">Tags</label>
                         <div className="form-control form-control-sm scrollable" id="tags">
                             <ReactTags
@@ -64,16 +64,26 @@ export default class TodoItem extends React.Component {
                             />
                         </div> 
                     </div>
-                    <button
-                        className="btn btn-success btn-sm"
-                        onClick={(e) => {
-                            let editedTodo = {id: this.props.id, description: this.state.text, tag_list: this.state.tags.map(item => item.name) };
-                            this.props.editHandler(editedTodo);
-                            this.handleEditing(e);
-                        }}
-                    >
-                        Done
-                    </button>
+                    <div className="btn-group" role="group">
+                        <button
+                            className="btn btn-success btn-sm"
+                            onClick={(e) => {
+                                let editedTodo = {id: this.props.id, description: this.state.text, tag_list: this.state.tags.map(item => item.name) };
+                                this.props.editHandler(editedTodo);
+                                this.handleEditing(e);
+                            }}
+                        >
+                            Done
+                        </button>
+                        <button
+                            className="btn btn-secondary btn-sm"
+                            onClick={(e) => {
+                                this.setState({ editing: false, text: this.props.text, tags: this.props.tagList.map( (tag, index) => { return {id: index, name: tag}; }) } );
+                            }}
+                        >
+                            Discard changes
+                        </button>
+                    </div>
                 </li>
             );
         } else {

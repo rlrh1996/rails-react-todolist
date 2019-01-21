@@ -1,13 +1,13 @@
 import React from 'react';
 import SearchFilter from './searchFilter';
 import TodoList from './todoList';
+import TodoItemInput from './todoIteminput';
 
 export default class Main extends React.Component {
     
     constructor(props) {
         super(props);
-        this.state = { items: [], tags: [], text: '', filter: '', search: '' };
-        this.handleChange = this.handleChange.bind(this);
+        this.state = { items: [], tags: [], filter: '', search: '' };
         this.handleSubmit = this.handleSubmit.bind(this);
         this.handleDelete = this.handleDelete.bind(this);
         this.handleEdit = this.handleEdit.bind(this);
@@ -63,20 +63,7 @@ export default class Main extends React.Component {
                         </div>
                         <div className="col">
                             <div className="row mt-3">
-                                <form className="container" onSubmit={this.handleSubmit}>
-                                    <div className="shadow input-group">
-                                        <input
-                                            className="form-control form-control-lg"
-                                            onChange={this.handleChange}
-                                            value={this.state.text}
-                                            placeholder="What do you need to do?"
-                                            autoFocus
-                                        />
-                                        <div className="input-group-append">
-                                            <button className="btn btn-lg btn-info" type="submit"><i className="fas fa-plus"></i></button>
-                                        </div>
-                                    </div>
-                                </form>
+                                <TodoItemInput submitHandler={this.handleSubmit} />
                             </div>
                             <div className="row mt-3">
                                 <div className="container">
@@ -90,22 +77,13 @@ export default class Main extends React.Component {
         );
     }
 
-    handleChange(e) {
-        this.setState({ text: e.target.value });
-    }
-
-    handleSubmit(e) {
-        
-        e.preventDefault();
-        if (!this.state.text.length) { return; }
-        
-        let body = JSON.stringify({todo: {completed: false, description: this.state.text} });
+    handleSubmit(todo) {
         fetch(`api/todos`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: body,
+            body: JSON.stringify({todo: todo}),
         })
         .then((response) => { return response.json(); })
         .then((todo)=>{
@@ -115,7 +93,6 @@ export default class Main extends React.Component {
             */
             this.setState(state => ({
                 items: state.items.concat(todo),
-                text: ''
             }), () => this.updateTagList());
         });
 
