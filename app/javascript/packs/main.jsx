@@ -126,10 +126,11 @@ export default class Main extends React.Component {
             let items = [...this.state.items];
             const index = items.findIndex(item => item.id === data.id);
             let item = { ...items[index] };
+            item.due_at = data.due_at;
             item.completed = data.completed;
             item.description = data.description;
             item.tag_list = data.tag_list;
-            items[index] = item;
+            items[index] = item; 
             this.setState({ items }, () => this.updateTagList());
         });
         
