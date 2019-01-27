@@ -35,6 +35,24 @@ export default class SearchFilter extends React.Component {
                         <i className="far fa-check-square"></i>
                     </div>
                 </button>
+                <button key="today" className={this.props.filter === "today" ? "list-group-item list-group-item-info list-group-item-action py-2" : "list-group-item list-group-item-action py-2"} onClick={(e) => this.props.setFilter('today')}>
+                    <div className="d-flex justify-content-between align-items-center">
+                        Due today
+                        <i className="far fa-calendar-alt"></i>
+                    </div>
+                </button>
+                <button key="7days" className={this.props.filter === "7days" ? "list-group-item list-group-item-info list-group-item-action py-2" : "list-group-item list-group-item-action py-2"} onClick={(e) => this.props.setFilter('7days')}>
+                    <div className="d-flex justify-content-between align-items-center">
+                        Due in next 7 days
+                        <i className="far fa-calendar-alt"></i>
+                    </div>
+                </button>
+                <button key="14days" className={this.props.filter === "14days" ? "list-group-item list-group-item-info list-group-item-action py-2" : "list-group-item list-group-item-action py-2"} onClick={(e) => this.props.setFilter('14days')}>
+                    <div className="d-flex justify-content-between align-items-center">
+                        Due in next 14 days
+                        <i className="far fa-calendar-alt"></i>
+                    </div>
+                </button>
                 {this.props.tags.map(tag => 
                     <button 
                         key={tag} 
