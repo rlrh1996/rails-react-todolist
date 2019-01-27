@@ -145,7 +145,19 @@ export default class Main extends React.Component {
     }
 
     getFilteredSearchedItems() {
+
+        function getDateDaysFromToday(days) {
+            var result = new Date();
+            result.setDate(result.getDate() + days);
+            return result;
+        }
+
+        function getIsoDateFrom(date) {
+            return date.toISOString().substring(0,10);
+        }
+
         let items = [];
+        let dates = [];
         switch (this.state.filter) {
             case '':
                 items = this.state.items;
@@ -155,6 +167,24 @@ export default class Main extends React.Component {
                 break;
             case 'completed':
                 items = this.state.items.filter(item => item.completed);
+                break;
+            case 'today':
+                const todaysDate = getIsoDateFrom(new Date());
+                items = this.state.items.filter(item => item.due_at == todaysDate);
+                break;
+            case '7days':
+                dates = [];
+                for (let i = 0; i < 7; i++) {
+                    dates.push(getIsoDateFrom(getDateDaysFromToday(i)));
+                }
+                items = this.state.items.filter(item => dates.some(date => date == item.due_at));
+                break;
+            case '14days':
+                dates = [];
+                for (let i = 0; i < 14; i++) {
+                    dates.push(getIsoDateFrom(getDateDaysFromToday(i)));
+                }
+                items = this.state.items.filter(item => dates.some(date => date == item.due_at));
                 break;
             default:
                 items = this.state.items.filter(item => item.tag_list.includes(this.state.filter));
