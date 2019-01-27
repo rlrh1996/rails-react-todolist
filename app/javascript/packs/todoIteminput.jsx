@@ -5,7 +5,7 @@ export default class TodoItemInput extends React.Component {
 
     constructor(props) {
         super(props);
-        this.state = { text: '', tags: [], expanded: false };
+        this.state = { text: '', tags: [], expanded: false, date: this.props.date ? this.props.date : "" };
         this.handleSubmit = this.handleSubmit.bind(this);
         this.handleChange = this.handleChange.bind(this);
         this.handleDelete = this.handleDelete.bind(this);
@@ -16,7 +16,7 @@ export default class TodoItemInput extends React.Component {
         console.log(this.state);
         e.preventDefault();
         if (!this.state.text.length) { return; }
-        let todo = { completed: false, description: this.state.text, tag_list: this.state.tags.map(item => item.name) };
+        let todo = { completed: false, description: this.state.text, due_at: this.state.date, tag_list: this.state.tags.map(item => item.name) };
         this.props.submitHandler(todo);
         this.setState(({ text: '', tags: [], expanded: false }))
     }
@@ -39,7 +39,7 @@ export default class TodoItemInput extends React.Component {
         if (this.state.expanded) {
             return (
                 <form className="container" onSubmit={this.handleSubmit}>
-                    <div className="card">
+                    <div className="shadow card">
                         <div className="card-body">
                             <div className="d-flex justify-content-between">
                                 <button className="btn btn-sm btn-light" onClick={() => this.setState({ expanded: false })}><i className="fas fa-angle-up"></i> Less options</button>
@@ -49,7 +49,7 @@ export default class TodoItemInput extends React.Component {
                             </div>
                             <div className="form-group m-0">
                                 <label className="col-form-label-sm m-0" htmlFor="description">Description</label>
-                                <input className="form-control form-control-sm m-0" onChange={this.handleChange} value={this.state.text} placeholder="What do you need to do?" id="description" autoFocus/>
+                                <input className="form-control form-control-sm m-0" onChange={this.handleChange} value={this.state.text} placeholder="What do you need to do?" id="description" autoFocus />
                             </div>
                             <div className="form-group m-0">
                                 <label className="col-form-label-sm m-0" htmlFor="tags">Tags</label>
@@ -76,7 +76,16 @@ export default class TodoItemInput extends React.Component {
                                     />
                                 </div>
                             </div>
-                            
+                            <div className="form-group m-0">
+                                <label className="col-form-label-sm m-0" htmlFor="date">Due Date</label>
+                                <input
+                                    className="form-control form-control-sm m-0"
+                                    type="date"
+                                    value={this.state.date}
+                                    onChange={e => { this.setState({ date: e.target.value }); }}
+                                >
+                                </input>
+                            </div>
                         </div>
                     </div>
                 </form>

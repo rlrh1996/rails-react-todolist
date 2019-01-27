@@ -5,11 +5,13 @@ export default class TodoItem extends React.Component {
 
     constructor(props) {
         super(props);
-        this.state = { editing: false, text: this.props.text, tags: this.props.tagList.map( (tag, index) => { return {id: index, name: tag}; } ) };
+        this.state = { editing: false, text: this.props.text, date: this.props.date ? this.props.date : "", tags: this.props.tagList.map((tag, index) => { return { id: index, name: tag }; }) };
         this.handleChange = this.handleChange.bind(this);
         this.handleEditing = this.handleEditing.bind(this);
         this.handleDelete = this.handleDelete.bind(this);
         this.handleAddition = this.handleAddition.bind(this);
+        this.handleDone = this.handleDone.bind(this);
+        this.handleDiscard = this.handleDiscard.bind(this);
     }
 
     handleChange(e) {
@@ -25,9 +27,19 @@ export default class TodoItem extends React.Component {
         tags.splice(i, 1);
         this.setState({ tags: tags });
     }
-    
+
     handleAddition(tag) {
         this.setState({ tags: [].concat(this.state.tags, tag) })
+    }
+
+    handleDone(e) {
+        let editedTodo = { id: this.props.id, description: this.state.text, due_at: this.state.date, tag_list: this.state.tags.map(item => item.name) };
+        this.props.editHandler(editedTodo);
+        this.handleEditing(e);
+    }
+
+    handleDiscard(e) {
+        this.setState({ editing: false, text: this.props.text, tags: this.props.tagList.map((tag, index) => { return { id: index, name: tag }; }) });
     }
 
     render() {
@@ -37,19 +49,19 @@ export default class TodoItem extends React.Component {
                 <li className="list-group-item" key={this.props.id} >
                     <div className="form-group m-0">
                         <label className="col-form-label-sm m-0" for="description">Description</label>
-                        <input className="form-control form-control-sm m-0" onChange={this.handleChange} value={this.state.text} placeholder="What do you need to do?" id="description" autoFocus required/>
-                    </div>  
-                    <div className="form-group mt-0">  
+                        <input className="form-control form-control-sm m-0" onChange={this.handleChange} value={this.state.text} placeholder="What do you need to do?" id="description" autoFocus required />
+                    </div>
+                    <div className="form-group m-0">
                         <label className="col-form-label-sm m-0" for="tags">Tags</label>
                         <div className="form-control form-control-sm scrollable" id="tags">
                             <ReactTags
                                 tags={this.state.tags}
                                 handleDelete={this.handleDelete}
-                                handleAddition={this.handleAddition} 
+                                handleAddition={this.handleAddition}
                                 allowNew={true}
                                 autofocus={false}
                                 addOnBlur={true}
-                                delimiters={[13,9,188]}
+                                delimiters={[13, 9, 188]}
                                 classNames={
                                     {
                                         root: '',
@@ -62,24 +74,24 @@ export default class TodoItem extends React.Component {
                                     }
                                 }
                             />
-                        </div> 
+                        </div>
+                    </div>
+                    <div className="form-group mt-0">
+                        <label className="col-form-label-sm m-0" htmlFor="date">Due Date</label>
+                        <input
+                            className="form-control form-control-sm m-0"
+                            id="date"
+                            type="date"
+                            value={this.state.date}
+                            onChange={e => { this.setState({ date: e.target.value }); }}
+                        >
+                        </input>
                     </div>
                     <div className="btn-group" role="group">
-                        <button
-                            className="btn btn-success btn-sm"
-                            onClick={(e) => {
-                                let editedTodo = {id: this.props.id, description: this.state.text, tag_list: this.state.tags.map(item => item.name) };
-                                this.props.editHandler(editedTodo);
-                                this.handleEditing(e);
-                            }}
-                        >
+                        <button className="btn btn-success btn-sm" onClick={this.handleDone}>
                             Done
                         </button>
-                        <button
-                            className="btn btn-secondary btn-sm"
-                            onClick={(e) => {
-                                this.setState({ editing: false, text: this.props.text, tags: this.props.tagList.map( (tag, index) => { return {id: index, name: tag}; }) } );
-                            }}
+                        <button className="btn btn-secondary btn-sm" onClick={this.handleDiscard}
                         >
                             Discard changes
                         </button>
@@ -96,7 +108,7 @@ export default class TodoItem extends React.Component {
                                 type="checkbox"
                                 checked={this.props.completed}
                                 onChange={() => {
-                                    let editedTodo = {id: this.props.id, completed: !this.props.completed};
+                                    let editedTodo = { id: this.props.id, completed: !this.props.completed };
                                     this.props.editHandler(editedTodo);
                                 }}
                             />
@@ -105,10 +117,11 @@ export default class TodoItem extends React.Component {
                                     {this.props.completed ? <del>{this.state.text}</del> : <span>{this.state.text}</span>}
                                 </label>
                                 <div>
+                                    {this.props.date && <small className="m-1">Due {(new Date(this.props.date)).toLocaleDateString()}</small>}
                                     {this.props.tagList.map((tag, index) => <button key={index} onClick={() => this.props.setFilter(tag)} className="badge badge-info mr-1">{tag}</button>)}
                                 </div>
                             </div>
-                            
+
                         </div>
                     </div>
                     <div className="btn-group btn-group-sm ml-1" role="group">
@@ -191,7 +204,7 @@ export default class TodoItem extends React.Component {
                                     {this.props.tagList.map((tag, index) => <button key={index} onClick={() => this.props.setFilter(tag)} className="badge badge-info mr-1">{tag}</button>)}
                                 </div>
                             </div>
-                            
+
                         </div>
                     </div>
                     <div className="btn-group btn-group-sm ml-1" role="group">
