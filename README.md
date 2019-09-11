@@ -7,9 +7,9 @@ Heroku automatically deploys from here to [https://rails-react-todolist.herokuap
 React components are at `app/javascript/packs`.
 
 This README would normally document whatever steps are necessary to get the
-application up and running. But this is not a normal README.
+application up and running.
 
-Things I may want to cover (but haven't):
+Things I may want to cove:
 
 * Ruby version
 
